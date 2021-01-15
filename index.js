@@ -21,14 +21,17 @@ const { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes, nextISSTimesForMyLocat
 //   console.log("It worked. Passed Times: ", data);
 // });
 
-nextISSTimesForMyLocation((error, passTimes) => {
-  if (error) {
-    return console.log('Error is', error);
-  };
-  
-  for(passTime of passTimes) {
+const printPassTimes = function(passTimes) {
+  for(const passTime of passTimes) {
     const datetime = new Date(0);
     datetime.setUTCSeconds(passTime.risetime);
     console.log(`Next pass at ${datetime} for a duration of ${passTime.duration}`);
   }
+};
+
+nextISSTimesForMyLocation((error, passTimes) => {
+  if (error) {
+    return console.log('Error is', error);
+  }
+  printPassTimes(passTimes);
 });
