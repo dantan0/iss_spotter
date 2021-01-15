@@ -15,12 +15,13 @@ const fetchISSFlyOverTimes = function(body) {
 };
 
 const nextISSTimesForMyLocation = function() {
-  fetchMyIP()
+  // don't forget to return fetchMyIP which creates a promise
+  return fetchMyIP()
     .then(fetchCoordsByIP)
     .then(fetchISSFlyOverTimes)
     .then(body => {
       const { response } = JSON.parse(body);
-      console.log(response);
+      return response;
     });
 };
 
