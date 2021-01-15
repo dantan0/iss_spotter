@@ -24,6 +24,7 @@ const fetchMyIP = function(callback) {
     }
     const ip = JSON.parse(body).ip;
     callback(null, ip);
+    return ip;
   });
 };
 
@@ -43,6 +44,7 @@ const fetchCoordsByIP = function(ip, callback) {
     // coords.latitude = JSON.parse(body).latitude;
     const { latitude, longitude } = JSON.parse(body);
     callback(null, { latitude, longitude });
+    return { latitude, longitude };
   });
 };
 
@@ -70,7 +72,41 @@ const fetchISSFlyOverTimes = function(coords, callback) {
     }
     const passTimes = JSON.parse(body).response;
     callback(null, passTimes);
+    return passTimes;
   });
 };
 
-module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes };
+/**
+ * Orchestrates multiple API requests in order to determine the next 5 upcoming ISS fly overs for the user's current location.
+ * Input:
+ *   - A callback with an error or results. 
+ * Returns (via Callback):
+ *   - An error, if any (nullable)
+ *   - The fly-over times as an array (null if error):
+ *     [ { risetime: <number>, duration: <number> }, ... ]
+ */ 
+
+const nextISSTimesForMyLocation = function(callback) {
+  // const ip = fetchMyIP(callback);
+  // const { latitude, longitude } = fetchCoordsByIP(ip, callback);
+  // const passTimes = fetchISSFlyOVerTimes({ latitude, longitude }, callback);
+  // return passTimes;
+  fetchMyIP((error, ip) => {
+    if (error) {
+      return console.log('Error is: ', error);
+    }
+    fetchCoordsByIP(ip, (error, coords) => {
+      if (error) {
+        return console.log('Error is ', error);
+      }
+      fetchISSFlyOverTimes(coords, (error, passTimes) => {
+        if (error) {
+          return console.log('Error is', error);
+        }
+        callback(null, passTimes);
+      })
+    })
+  })
+};
+
+module.exports = { fetchMyIP, fetchCoordsByIP, fetchISSFlyOverTimes, nextISSTimesForMyLocation };
